@@ -1,0 +1,30 @@
+{
+  "name": "node-first-app",
+  "version": "1.0.0",
+  "description": "Complete Node.js",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --inspect app.js",
+    "start-server": "node app.js"
+  },
+  "author": "Pham Nguyen Anh Duy FX13348",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/duypnafx13348/NodeJS-LAB/issues"
+  },
+  "homepage": "https://github.com/duypnafx13348/NodeJS-LAB#readme",
+  "dependencies": {
+    "body-parser": "^1.19.2",
+    "ejs": "^3.1.6",
+    "express": "^4.17.3",
+    "express-handlebars": "3.0",
+    "moment": "^2.29.3",
+    "mongodb": "^4.5.0",
+    "mongoose": "^6.3.1",
+    "mysql2": "^2.3.3",
+    "nodemon": "^1.18.3",
+    "pug": "^3.0.2",
+    "sequelize": "^6.19.0"
+  }
+}
