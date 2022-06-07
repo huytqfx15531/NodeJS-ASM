@@ -2,16 +2,20 @@ const Staff = require("../models/staff");
 const moment = require("moment");
 
 exports.getMuster = (req, res, next) => {
-  Staff.findById(req.staff._id)
-    .then((staff) => {
-      // console.log(staff);
-      res.render("muster/muster", {
-        pageTitle: "Muster",
-        path: "/muster",
-        staffs: staff,
-      });
-    })
-    .catch((err) => console.log(err));
+  if (!req.session.isLoggedIn) {
+    return res.redirect("/login");
+  } else {
+    Staff.findById(req.staff._id)
+      .then((staff) => {
+        console.log(staff);
+        res.render("muster/muster", {
+          pageTitle: "Muster",
+          path: "/muster",
+          staffs: staff,
+        });
+      })
+      .catch((err) => console.log(err));
+  }
 };
 
 exports.getCheckIn = (req, res, next) => {

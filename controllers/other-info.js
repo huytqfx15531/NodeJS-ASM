@@ -1,44 +1,93 @@
+const fs = require("fs");
+const path = require("path");
+const PDFDocument = require("pdfkit");
 const Staff = require("../models/staff");
 
+const ITEMS_PER_PAGE = 2;
+
 exports.getStaffInfo = (req, res, next) => {
-  Staff.findById(req.staff._id)
-    .then((staff) => {
-      console.log("staffs-info", staff.workTimes);
-      res.render("other-info/staff-info", {
-        path: "/staff-info",
-        pageTitle: "Staff Info",
-        staffs: staff,
-      });
-    })
-    .catch((err) => console.log(er));
+  if (!req.session.isLoggedIn) {
+    return res.redirect("/login");
+  } else {
+    Staff.findById(req.staff._id)
+      .then((staff) => {
+        res.render("other-info/staff-info", {
+          path: "/staff-info",
+          pageTitle: "Staff Info",
+          staffs: staff,
+        });
+      })
+      .catch((err) => console.log(er));
+  }
 };
 
-exports.getWorkInfo = (req, res, next) => {
-  console.log(req.staff);
+exports.postStaffInfo = (req, res, next) => {
+  const avatar = req.file;
+  console.log("avatar", avatar);
+  if (!avatar) {
+    console.log("khong co avatar");
+    res.render("other-info/staff-info", {
+      path: "/staff-info",
+      pageTitle: "Staff Info",
+      staffs: req.session.staff,
+    });
+  }
+  const image = avatar.path;
+  req.staff.image = image;
   req.staff
-    .handleTotalTimes(req.staff)
-    .then((staff) => {
-      const overTime = staff.totalTimesWork > 8 ? staff.totalTimesWork - 8 : 0;
-      const shortTime = staff.totalTimesWork < 8 ? staff.totalTimesWork - 8 : 0;
-      const salary =
-        staff.salaryScale * 3000000 + (overTime - shortTime) * 200000;
-      console.log("overTime", overTime);
-      console.log("shortTime", shortTime);
-      res.render("other-info/work-info", {
-        path: "/work-info",
-        pageTitle: "Working Info",
-        staffs: staff,
-        salary: salary,
-      });
+    .save()
+    .then((result) => {
+      console.log("postStaffInfo", result);
+      res.redirect("/staff-info");
     })
     .catch((err) => console.log(err));
 };
 
+exports.getWorkInfo = (req, res, next) => {
+  const page = req.query.page;
+
+  if (!req.session.isLoggedIn) {
+    return res.redirect("/login");
+  } else {
+    req.staff
+    .handleTotalTimes(req.staff)
+    // Staff.findById(req.staff._id)
+      // .skip((page - 1) * ITEMS_PER_PAGE)
+      // .limit(ITEMS_PER_PAGE)
+      .then((staff) => {
+        console.log("staff", staff);
+        const overTime =
+          staff.totalTimesWork > 8 ? staff.totalTimesWork - 8 : 0;
+        const shortTime =
+          staff.totalTimesWork < 8 ? staff.totalTimesWork - 8 : 0;
+        const salary =
+          staff.salaryScale * 3000000 + (overTime - shortTime) * 200000;
+        res.render("other-info/work-info", {
+          path: "/work-info",
+          pageTitle: "Working Info",
+          staffs: staff,
+          salary: salary,
+        });
+      })
+      .catch((err) => console.log(err));
+  }
+};
+
 exports.getCovidInfo = (req, res, next) => {
-  res.render("other-info/covid-info", {
-    pageTitle: "Covid Info",
-    path: "/covid-info",
-  });
+  if (!req.session.isLoggedIn) {
+    return res.redirect("/login");
+  } else {
+    Staff.find({ position: "staff" })
+      .then((staff) => {
+        res.render("other-info/covid-info", {
+          pageTitle: "Covid Info",
+          path: "/covid-info",
+          staffs: staff,
+          position: req.session.staff.position,
+        });
+      })
+      .catch((err) => console.log(err));
+  }
 };
 
 exports.postBodyTemperature = (req, res, next) => {
@@ -92,6 +141,55 @@ exports.postInfectCovidInfo = (req, res, next) => {
     .then((result) => {
       console.log("CREATED addInfectCovidInfo");
       res.redirect("/covid-info");
+    })
+    .catch((err) => console.log(err));
+};
+
+exports.getPDF = (req, res, next) => {
+  const covidId = req.params.covidId;
+  Staff.findById(covidId)
+    .then((staff) => {
+      let temperature = staff.bodyTemperature[0]
+        ? staff.bodyTemperature[0].temperature
+        : "";
+      let nameVaccine1 = staff.vaccineInfo[0]
+        ? staff.vaccineInfo[0].nameVaccine1
+        : "";
+      let date1 = staff.vaccineInfo[0]
+        ? staff.vaccineInfo[0].date1.getDate() +
+          "/" +
+          (+staff.vaccineInfo[0].date1.getMonth() + 1) +
+          "/" +
+          staff.vaccineInfo[0].date1.getFullYear()
+        : "";
+      let nameVaccine2 = staff.vaccineInfo[1]
+        ? staff.vaccineInfo[1].nameVaccine2
+        : "";
+      let date2 = staff.vaccineInfo[0]
+        ? staff.vaccineInfo[0].date2.getDate() +
+          "/" +
+          (+staff.vaccineInfo[0].date2.getMonth() + 1) +
+          "/" +
+          staff.vaccineInfo[0].date2.getFullYear()
+        : "";
+
+      const pdfName = staff.name + ".pdf";
+      const pdfPath = path.join("data", "covidPdf", pdfName);
+      const file = fs.createWriteStream(pdfPath);
+      const pdfDoc = new PDFDocument();
+      pdfDoc.pipe(file);
+      pdfDoc.pipe(res);
+
+      pdfDoc.fontSize(26).text("Staff - Covid", { underline: true });
+      pdfDoc.text("---------------");
+      pdfDoc.text("Ten nhan vien : " + staff.name);
+      pdfDoc.text("Nhiet do: " + temperature);
+      pdfDoc.text("Vaccine mui mot: " + nameVaccine1);
+      pdfDoc.text("Ngay tiem: " + date1);
+      pdfDoc.text("Vaccine mui 2: " + nameVaccine2);
+      pdfDoc.text("Ngay tiem : " + date2);
+      pdfDoc.text("---------------");
+      pdfDoc.end();
     })
     .catch((err) => console.log(err));
 };

@@ -1,11 +1,23 @@
 <%- include('../includes/head.ejs') %>
-<!-- <style>
-    table, th, td {
-    border: 1px solid black;
-    padding: 3px 30px;
-    text-align: center;
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+/>
+<style>
+    .pagination {
+        margin: 1rem;
+        display: flex;
+        justify-content: center;
     }
-</style> -->
+
+    .pagination a {
+        text-decoration: none;
+        color: #00695c;
+        padding: 0.5rem;
+        border: 1px solid #00695c;
+        margin: 0 1rem;
+    }
+</style>
     </head>
 
     <body>
@@ -42,6 +54,11 @@
                         </tbody>
                         <% }); %>
                     </table>
+                    <section class="pagination">
+                        <a href="/work-info/?page=1">1</a>
+                        <a href="/work-info/?page=2">2</a>
+                        <a href="/work-info/?page=3">3</a>
+                    </section>
                     <p><b>Tổng số giờ đã làm ngày hôm nay: </b><%= staffs.totalTimesWork %> h</p>
                     <p><b>Số Giờ làm thêm: </b><%= staffs.totalTimesWork > 8 ? staffs.totalTimesWork - 8 + " h" : "--" %></p>
                 </div>

@@ -2,6 +2,14 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const staffSchema = new Schema({
+  username: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
@@ -25,11 +33,16 @@ const staffSchema = new Schema({
   annualLeave: {
     type: Number,
   },
+  position: {
+    type: String,
+    required: true,
+  },
   image: {
     type: String,
     required: true,
   },
   workStatus: { type: Boolean },
+  isConfirm: { type: Boolean },
   workTimes: [
     {
       startTime: { type: Date },
@@ -136,11 +149,5 @@ staffSchema.methods.addInfectCovidInfo = function (infectCovidInfo) {
   this.infectCovidInfo = updateInfectCovidInfo;
   return this.save();
 };
-
-// staffSchema.methods.handleSalary = function (staff) {
-//   const overTime = staff.totalTimesWork > 8 ? staff.totalTimesWork - 8 : 0;
-//   const shortTime = staff.totalTimesWork < 8 ? staff.totalTimesWork - 8 : 0;
-//   const salary = staff.salaryScale * 3000000 + (overTime - shortTime) * 200000;
-// };
 
 module.exports = mongoose.model("Staff", staffSchema);
