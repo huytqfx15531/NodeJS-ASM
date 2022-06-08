@@ -5,6 +5,7 @@ const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const multer = require("multer");
+const PORT = 3000;
 
 const homeRoutes = require("./routes/home");
 const musterRoutes = require("./routes/muster");
@@ -130,7 +131,9 @@ mongoose
         }
       })
       .then((a) => {
-        app.listen(3000);
+        app.listen(process.env.PORT || 8080, "0.0.0.0", () => {
+          console.log("Connect with mongoBD");
+        });
       });
   })
   .catch((err) => console.log(err));
