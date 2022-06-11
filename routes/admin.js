@@ -3,9 +3,9 @@ const router = express.Router();
 
 const adminController = require("../controllers/admin");
 
-router.get("/admin/staff", adminController.getIndex);
+router.get("/admin/staff", adminController.getStaffManager);
 
-router.post("/admin/staff", adminController.postIndex);
+router.post("/admin/staff", adminController.postStaffManager);
 
 router.post("/admin/deleteWorkTime", adminController.postDeleteWorkTime);
 

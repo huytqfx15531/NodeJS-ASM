@@ -1,18 +1,22 @@
 const Staff = require("../models/staff");
 
-exports.getIndex = (req, res, next) => {
-  Staff.find({ position: "staff" })
-    .then((staff) => {
-      res.render("admin/index", {
-        pageTitle: "Staff Manager",
-        path: "/admin/staff",
-        staffs: staff,
-      });
-    })
-    .catch((err) => console.log(err));
+exports.getStaffManager = (req, res, next) => {
+  if (!req.session.isLoggedIn) {
+    return res.redirect("/login");
+  } else {
+    Staff.find({ position: "staff" })
+      .then((staff) => {
+        res.render("admin/staffManager", {
+          pageTitle: "Staff Manager",
+          path: "/admin/staff",
+          staffs: staff,
+        });
+      })
+      .catch((err) => console.log(err));
+  }
 };
 
-exports.postIndex = (req, res, next) => {
+exports.postStaffManager = (req, res, next) => {
   if (req.body.staff === "none") {
     return res.redirect("/admin");
   }
@@ -26,7 +30,7 @@ exports.postIndex = (req, res, next) => {
             return +workTime.startTime.getMonth() + 1 === selectMonth;
           });
           if (workTimes.length === 0) {
-            return res.render("admin/postIndex", {
+            return res.render("admin/postStaffManager", {
               pageTitle: "Staff Manager",
               path: "/admin/staff",
               workTimes: workTimes,
@@ -34,7 +38,7 @@ exports.postIndex = (req, res, next) => {
               month: selectMonth,
             });
           } else {
-            return res.render("admin/postIndex", {
+            return res.render("admin/postStaffManager", {
               pageTitle: "Staff Manager",
               path: "/admin/staff",
               workTimes: workTimes,

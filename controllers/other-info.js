@@ -2,8 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
 const Staff = require("../models/staff");
-
-const ITEMS_PER_PAGE = 2;
+const deleteFile = require("../util/fileHelper");
 
 exports.getStaffInfo = (req, res, next) => {
   if (!req.session.isLoggedIn) {
@@ -22,8 +21,8 @@ exports.getStaffInfo = (req, res, next) => {
 };
 
 exports.postStaffInfo = (req, res, next) => {
+  deleteFile(req.staff.image);
   const avatar = req.file;
-  console.log("avatar", avatar);
   if (!avatar) {
     console.log("khong co avatar");
     res.render("other-info/staff-info", {
@@ -44,34 +43,120 @@ exports.postStaffInfo = (req, res, next) => {
 };
 
 exports.getWorkInfo = (req, res, next) => {
-  const page = req.query.page;
-
   if (!req.session.isLoggedIn) {
     return res.redirect("/login");
   } else {
-    req.staff
-    .handleTotalTimes(req.staff)
-    // Staff.findById(req.staff._id)
-      // .skip((page - 1) * ITEMS_PER_PAGE)
-      // .limit(ITEMS_PER_PAGE)
-      .then((staff) => {
-        console.log("staff", staff);
-        const overTime =
-          staff.totalTimesWork > 8 ? staff.totalTimesWork - 8 : 0;
-        const shortTime =
-          staff.totalTimesWork < 8 ? staff.totalTimesWork - 8 : 0;
-        const salary =
-          staff.salaryScale * 3000000 + (overTime - shortTime) * 200000;
-        res.render("other-info/work-info", {
-          path: "/work-info",
-          pageTitle: "Working Info",
-          staffs: staff,
-          salary: salary,
-        });
-      })
-      .catch((err) => console.log(err));
+    const page = +req.query.page || 1;
+    const ITEMS_PER_PAGE = +req.query.rowpage || 3;
+    let totalItems;
+    req.staff.handleTotalTimes(req.staff).then((staff) => {
+      const dataWork = staff.workTimes.slice(
+        (page - 1) * ITEMS_PER_PAGE,
+        page * ITEMS_PER_PAGE
+      );
+      console.log("dataWork", dataWork);
+      totalItems = staff.workTimes.length;
+      console.log("totalItems", totalItems);
+
+      res.render("other-info/work-info", {
+        path: "/work-info",
+        pageTitle: "Working Info",
+        staffs: staff,
+        dataWork: dataWork,
+        ITEMS_PER_PAGE: ITEMS_PER_PAGE,
+        currentPage: page,
+        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+      });
+    });
+    // Staff.findById(req.staff._id).then((staff) => {
+    //   const dataWork = staff.workTimes.slice(
+    //     (page - 1) * ITEMS_PER_PAGE,
+    //     page * ITEMS_PER_PAGE
+    //   );
+    //   console.log("dataWork", dataWork);
+    //   totalItems = staff.workTimes.length;
+    //   console.log("totalItems", totalItems);
+
+    //   res.render("other-info/work-info", {
+    //     path: "/work-info",
+    //     pageTitle: "Working Info",
+    //     staffs: staff,
+    //     dataWork: dataWork,
+    //     ITEMS_PER_PAGE: ITEMS_PER_PAGE,
+    //     currentPage: page,
+    //     hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+    //     hasPreviousPage: page > 1,
+    //     nextPage: page + 1,
+    //     previousPage: page - 1,
+    //     lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+    //   });
+    // });
   }
+  // if (page) {
+  //   Staff.findById(req.staff._id).then((staff) => {
+  //     const dataWork = staff.workTimes.slice(
+  //       (page - 1) * ITEMS_PER_PAGE,
+  //       page * ITEMS_PER_PAGE
+  //     );
+  //     console.log("dataWork", dataWork);
+  //     totalItems = staff.workTimes.length;
+  //     console.log("totalItems", totalItems);
+
+  //     res.render("other-info/work-info", {
+  //       path: "/work-info",
+  //       pageTitle: "Working Info",
+  //       staffs: staff,
+  //       dataWork: dataWork,
+  //       ITEMS_PER_PAGE: ITEMS_PER_PAGE,
+  //       currentPage: page,
+  //       hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+  //       hasPreviousPage: page > 1,
+  //       nextPage: page + 1,
+  //       previousPage: page - 1,
+  //       lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+  //     });
+  //   });
+  // } else {
+  //   Staff.findById(req.staff._id).then((staff) => {
+  //     let dataWork = staff.workTimes;
+  //     res.render("other-info/work-info", {
+  //       path: "/work-info",
+  //       pageTitle: "Working Info",
+  //       staffs: staff,
+  //       dataWork: dataWork,
+  //       ITEMS_PER_PAGE: ITEMS_PER_PAGE,
+  //       currentPage: page,
+  //       hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+  //       hasPreviousPage: page > 1,
+  //       nextPage: page + 1,
+  //       previousPage: page - 1,
+  //       lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+  //     });
+  //   });
+  // }
 };
+// req.staff
+//   .handleTotalTimes(req.staff)
+//   .then((staff) => {
+//     console.log("staff", staff);
+//     const overTime =
+//       staff.totalTimesWork > 8 ? staff.totalTimesWork - 8 : 0;
+//     const shortTime =
+//       staff.totalTimesWork < 8 ? staff.totalTimesWork - 8 : 0;
+//     const salary =
+//       staff.salaryScale * 3000000 + (overTime - shortTime) * 200000;
+//     res.render("other-info/work-info", {
+//       path: "/work-info",
+//       pageTitle: "Working Info",
+//       staffs: staff,
+//       salary: salary,
+//     });
+//   })
+//   .catch((err) => console.log(err));
 
 exports.getCovidInfo = (req, res, next) => {
   if (!req.session.isLoggedIn) {

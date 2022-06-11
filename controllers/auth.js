@@ -33,7 +33,7 @@ exports.postLogin = (req, res, next) => {
 exports.postLogout = (req, res, next) => {
   console.log("destroy", req.session.isLoggedIn);
   req.session.destroy((err) => {
-    console.log(err);
+    // console.log(err);
     res.redirect("/");
   });
 };

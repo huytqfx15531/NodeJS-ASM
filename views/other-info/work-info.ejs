@@ -36,7 +36,7 @@
                                 <th>Giờ làm được</th>
                             </tr>
                         </thead>
-                        <% staffs.workTimes.forEach(workTime => { %>
+                        <% dataWork.forEach(workTime => { %>
                         <tbody>
                             <tr>
                                 <td><%= workTime.startTime.getDate() %></td>
@@ -54,11 +54,8 @@
                         </tbody>
                         <% }); %>
                     </table>
-                    <section class="pagination">
-                        <a href="/work-info/?page=1">1</a>
-                        <a href="/work-info/?page=2">2</a>
-                        <a href="/work-info/?page=3">3</a>
-                    </section>
+                    <%- include('../includes/pagination.ejs', {currentPage: currentPage, nextPage: nextPage, previousPage: previousPage, lastPage: lastPage, hasNextPage: hasNextPage, hasPreviousPage: hasPreviousPage}) %>
+                    
                     <p><b>Tổng số giờ đã làm ngày hôm nay: </b><%= staffs.totalTimesWork %> h</p>
                     <p><b>Số Giờ làm thêm: </b><%= staffs.totalTimesWork > 8 ? staffs.totalTimesWork - 8 + " h" : "--" %></p>
                 </div>
@@ -74,7 +71,7 @@
                         </thead>
                        
                         <tr>
-                            <%staffs.leaveInfoList.forEach(leaveInfo => {%>
+                            <% staffs.leaveInfoList.forEach(leaveInfo => {%>
                                 <tbody>
                                     <td>
                                         <%= leaveInfo.dayStartLeave.getDate() + "/" + leaveInfo.dayStartLeave.getMonth() + "/" + leaveInfo.dayStartLeave.getFullYear() %> - <%= leaveInfo.dayEndLeave.getDate() + "/" + leaveInfo.dayEndLeave.getMonth() + "/" + leaveInfo.dayEndLeave.getFullYear() %>
@@ -107,7 +104,7 @@
                         <option value="11">11</option>
                         <option value="12">12</option>
                     </select>
-                    <p><b>Salary: </b><%= salary %></p>
+                    <p><b>Salary: </b><%=  %></p>
                 </div>
             </div>
         </main>

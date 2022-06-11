@@ -18,12 +18,16 @@ const Staff = require("./models/staff");
 
 const MONGODB_URI =
   "mongodb+srv://duypnafx13348:poeietiiup1@employeemanager.uhkve.mongodb.net/EmployeeManager?retryWrites=true&w=majority";
+
 const app = express();
+
+// kết nói session với mongodb
 const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: "sessions",
 });
 
+// sử dụng thư viện csrf để bảo vệ khi thực hiện method="POST" nào đó
 const csrfProtection = csrf({});
 
 const fileStorage = multer.diskStorage({
@@ -54,10 +58,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
-// app.use(multer({ storage: fileStorage }).single("image"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/images", express.static(path.join(__dirname, "images")));
 
+// sử dụng mongodb để kết nói với session để lưu trữ thông tin người dùng
 app.use(
   session({
     secret: "my secret",
@@ -66,7 +70,7 @@ app.use(
     store: store,
   })
 );
-
+// sử dụng thư viện csrf để bảo vệ khi thực hiện method="POST" nào đó
 app.use(csrfProtection);
 
 app.use((req, res, next) => {
