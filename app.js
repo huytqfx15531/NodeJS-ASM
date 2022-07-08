@@ -17,7 +17,7 @@ const mongoose = require("mongoose");
 const Staff = require("./models/staff");
 
 const MONGODB_URI =
-  "mongodb+srv://duypnafx13348:poeietiiup1@employeemanager.uhkve.mongodb.net/EmployeeManager?retryWrites=true&w=majority";
+  "mongodb+srv://HUYFX15531:040199@cluster0.u03prrq.mongodb.net/?retryWrites=true&w=majority";
 
 const app = express();
 
@@ -113,8 +113,8 @@ mongoose
           const staff = new Staff({
             username: "admin",
             password: "123456",
-            name: "anh duy",
-            doB: new Date(1999, 01, 01),
+            name: "Tran Quang Huy",
+            doB: new Date(1999, 01, 04),
             salaryScale: 1.5,
             startDate: new Date(2021, 10, 25),
             department: "IT",

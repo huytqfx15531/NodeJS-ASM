@@ -8,12 +8,10 @@
     "start": "nodemon --inspect app.js",
     "start-server": "node app.js"
   },
-  "author": "Pham Nguyen Anh Duy FX13348",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/duypnafx13348/NodeJS-LAB/issues"
-  },
-  "homepage": "https://github.com/duypnafx13348/NodeJS-LAB#readme",
+  "author": "Tran Quang Huy fx15531",
+  "license": "ISC"
+,
+
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.2",
